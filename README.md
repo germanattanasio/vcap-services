@@ -1,7 +1,7 @@
 # VCAP_SERVICES
 
 [![Build Status](https://secure.travis-ci.org/vcap_services/vcap_services.png)](http://travis-ci.org/germanattanasio/vcap_services)
-[![Coverage Status](https://img.shields.io/coveralls/germanattanasio/vcap_services.svg)](https://coveralls.io/r/germanattanasio/vcap_services)
+[![Coverage Status](https://coveralls.io/repos/germanattanasio/vcap_services/badge.svg?branch=master&service=github)](https://coveralls.io/github/germanattanasio/vcap_services?branch=master)
 [![npm-version](https://img.shields.io/npm/v/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 [![npm-downloads](https://img.shields.io/npm/dm/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 
