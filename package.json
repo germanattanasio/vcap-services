@@ -1,6 +1,6 @@
 {
   "name": "vcap_services",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Parse and return service credentials from VCAP_SERVICES.",
   "main": "index.js",
   "keywords": [
@@ -10,7 +10,6 @@
   ],
   "author": "German Attanasio Ruiz <germanattanasio@gmail.com>",
   "license": "MIT",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/germanattanasio/vcap_services.git"
@@ -24,8 +23,7 @@
     "istanbul": "~0.3.15",
     "jshint": "~2.8.0"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "scripts": {
     "test": "jshint --exclude node_modules/ **/*.js && mocha --reporter spec --timeout 4000",
     "prepare": "npm test && npm version patch",
@@ -33,4 +31,3 @@
     "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   }
 }
-
