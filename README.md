@@ -16,13 +16,11 @@ $ npm install vcap_services --save
 
 ## Usage
 
-`getCredentials(name)`
---------
-* `name` - service name
-
-if `VCAP_SERVICES` exists then it returns the first credentials object for the service that starts with 'name' or {} otherwise.
-
-### Example
+```sh
+var vcapServices = require('vcap_services');
+var credentials = vcapServices.getCredentials('personality_insights');
+console.log(credentials);
+```
 
 If `VCAP_SERVICES` is:
 ```sh
@@ -40,12 +38,6 @@ If `VCAP_SERVICES` is:
    }]
   }
 }
-```
-
-```sh
-var vcapServices = require('vcap_services');
-var credentials = vcapServices.getCredentials('personality_insights');
-console.log(credentials);
 ```
 
 Output:
