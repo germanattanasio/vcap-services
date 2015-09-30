@@ -1,4 +1,4 @@
-VCAP_SERVICES
+# VCAP_SERVICES
 
 ============================================
 [![Build Status](https://secure.travis-ci.org/vcap_services/vcap_services.png)](http://travis-ci.org/germanattanasio/vcap_services)
