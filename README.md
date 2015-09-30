@@ -1,9 +1,7 @@
 # VCAP_SERVICES
 
-============================================
 [![Build Status](https://secure.travis-ci.org/vcap_services/vcap_services.png)](http://travis-ci.org/germanattanasio/vcap_services)
 [![Coverage Status](https://img.shields.io/coveralls/germanattanasio/vcap_services.svg)](https://coveralls.io/r/germanattanasio/vcap_services)
-
 [![npm-version](https://img.shields.io/npm/v/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 [![npm-downloads](https://img.shields.io/npm/dm/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 
@@ -17,13 +15,11 @@ $ npm install vcap_services --save
 
 ## Usage
 
-`getCredentials(name)`
---------
-* `name` - service name
-
-if `VCAP_SERVICES` exists then it returns the first credentials object for the service that starts with 'name' or {} otherwise.
-
-### Example
+```sh
+var vcapServices = require('vcap_services');
+var credentials = vcapServices.getCredentials('personality_insights');
+console.log(credentials);
+```
 
 If `VCAP_SERVICES` is:
 ```sh
@@ -41,12 +37,6 @@ If `VCAP_SERVICES` is:
    }]
   }
 }
-```
-
-```sh
-var vcapServices = require('vcap_services');
-var credentials = vcapServices.getCredentials('personality_insights');
-console.log(credentials);
 ```
 
 Output:
