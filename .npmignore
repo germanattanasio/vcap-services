@@ -1,0 +1,9 @@
+.jshintignore
+.hshintrc
+.jshintrc
+.travis.yml
+.DS_Store
+test
+node_modules
+coverage
+RELEASE.md
