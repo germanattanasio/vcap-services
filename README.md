@@ -1,6 +1,5 @@
 # VCAP_SERVICES
 
-============================================
 [![Build Status](https://secure.travis-ci.org/vcap_services/vcap_services.png)](http://travis-ci.org/germanattanasio/vcap_services)
 [![Coverage Status](https://img.shields.io/coveralls/germanattanasio/vcap_services.svg)](https://coveralls.io/r/germanattanasio/vcap_services)
 
