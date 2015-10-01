@@ -23,6 +23,8 @@ describe('vcap_services', function() {
     // set VCAP_SERVICES to a default value
     process.env.VCAP_SERVICES = JSON.stringify({
       personality_insights: [{
+        plan: 'beta'
+      },{
         credentials: credentials,
         label: 'personality_insights',
         name: 'personality-insights-service',
