@@ -5,7 +5,7 @@
 [![npm-version](https://img.shields.io/npm/v/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 [![npm-downloads](https://img.shields.io/npm/dm/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 
-Parse and return service credentials from `VCAP_SERVICES`.
+Parse and return service credentials from `VCAP_SERVICES` environment variable that [Bluemix] provides.
 
 ## Installation
 
@@ -22,20 +22,18 @@ console.log(credentials);
 ```
 
 If `VCAP_SERVICES` is:
-```sh
+```json
 {
-  "VCAP_SERVICES": {
-    "personality_insights": [{
-        "credentials": {
-          "password": "<password>",
-          "url": "<url>",
-          "username": "<username>"
-        },
-      "label": "personality_insights",
-      "name": "personality-insights-service",
-      "plan": "standard"
-   }]
-  }
+  "personality_insights": [{
+      "credentials": {
+        "password": "<password>",
+        "url": "<url>",
+        "username": "<username>"
+      },
+    "label": "personality_insights",
+    "name": "personality-insights-service",
+    "plan": "standard"
+  }]
 }
 ```
 
@@ -66,3 +64,5 @@ MIT.
 
 ## Contributing
 See [CONTRIBUTING](https://github.com/germanattanasio/vcap_services/blob/master/CONTRIBUTING.md).
+
+[Bluemix]: http://bluemix.net/
