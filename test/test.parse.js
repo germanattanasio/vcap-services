@@ -30,9 +30,14 @@ describe('vcap_services', function() {
       },{
         credentials: credentials,
         plan: 'standard'
+      }],
+      retrieve_and_rank: [{
+        name: 'retrieve-and-rank-standard',
+        label: 'retrieve_and_rank',
+        plan: 'standard',
+        credentials: credentials
       }]
     });
-
   });
 
   after(function() {
@@ -51,7 +56,7 @@ describe('vcap_services', function() {
     assert.deepEqual(credentials, vcapServices.getCredentials('personality'));
   });
 
-  it('should return the last available credentials', function() {
+  it('should return the last available credentials that match a plan', function() {
     assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights','standard'));
     assert.deepEqual({}, vcapServices.getCredentials('personality','beta'));
     assert.deepEqual({}, vcapServices.getCredentials('personality','foo'));
