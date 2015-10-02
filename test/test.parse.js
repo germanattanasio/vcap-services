@@ -23,11 +23,12 @@ describe('vcap_services', function() {
     // set VCAP_SERVICES to a default value
     process.env.VCAP_SERVICES = JSON.stringify({
       personality_insights: [{
+        plan: 'not-a-plan'
+      },{
+        credentials: {},
         plan: 'beta'
       },{
         credentials: credentials,
-        label: 'personality_insights',
-        name: 'personality-insights-service',
         plan: 'standard'
       }]
     });
@@ -45,9 +46,19 @@ describe('vcap_services', function() {
     assertEmptyObject({}, vcapServices.getCredentials(undefined));
   });
 
-  it('should return the first available credentials', function() {
+  it('should return the last available credentials', function() {
     assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights'));
     assert.deepEqual(credentials, vcapServices.getCredentials('personality'));
+  });
+
+  it('should return the last available credentials', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights','standard'));
+    assert.deepEqual({}, vcapServices.getCredentials('personality','beta'));
+    assert.deepEqual({}, vcapServices.getCredentials('personality','foo'));
+  });
+
+  it('should return {} when service plan not found', function() {
+    assert.deepEqual({}, vcapServices.getCredentials('personality','foo'));
   });
 
   it('should return {} when service not found', function() {
