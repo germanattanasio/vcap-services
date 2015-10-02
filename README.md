@@ -46,6 +46,15 @@ Output:
 }
 ```
 
+### Getting credentials for a specific plan
+
+Get credentials that match an specific service plan.
+```sh
+var vcapServices = require('vcap_services');
+var credentials = vcapServices.getCredentials('personality_insights', 'standard');
+console.log(credentials);
+```
+
 ## Tests
 Running all the tests:
 ```sh
