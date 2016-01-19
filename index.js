@@ -16,9 +16,9 @@ module.exports.getCredentials = function(name, plan) {
     for (var service_name in services) {
       if (service_name.indexOf(name) === 0) {
         for (var i = services[service_name].length - 1; i >= 0; i--) {
-          var instances = services[service_name][i];
-          if (!plan || plan === instances.plan)
-            return instances.credentials || {};
+          var instance = services[service_name][i];
+          if (!plan || plan === instance.plan)
+            return instance.credentials || {};
         }
       }
     }
