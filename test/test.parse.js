@@ -36,6 +36,15 @@ describe('vcap_services', function() {
         label: 'retrieve_and_rank',
         plan: 'standard',
         credentials: credentials
+      }],
+      natural_language_classifier: [{
+        name: 'NLC 1',
+        plan: 'standard',
+        credentials: credentials
+      },{
+        name: 'NLC 2',
+        plan: 'standard',
+        credentials: credentials
       }]
     });
   });
@@ -60,6 +69,19 @@ describe('vcap_services', function() {
     assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights','standard'));
     assert.deepEqual({}, vcapServices.getCredentials('personality','beta'));
     assert.deepEqual({}, vcapServices.getCredentials('personality','foo'));
+  });
+
+  it('should return the last available credentials that match an instance name', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier',null,'NLC 1'));
+    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier',null,'NLC 3'));
+    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
+    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
+  });
+
+  it('should return the last available credentials that match a plan and an instance name', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier','standard','NLC 1'));
+    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
+    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
   });
 
   it('should return {} when service plan not found', function() {
