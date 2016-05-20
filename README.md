@@ -55,7 +55,7 @@ var credentials = vcapServices.getCredentials('personality_insights', 'standard'
 console.log(credentials);
 ```
 
-### Getting credentials for a specific intsance
+### Getting credentials for a specific instance
 Get credentials that match a specific service instance (replace "YOUR NLC NAME" with the name of your service instance).
 ```sh
 var vcapServices = require('vcap_services');
@@ -63,7 +63,7 @@ var credentials = vcapServices.getCredentials('natural_language_classifier', nul
 console.log(credentials);
 ```
 
-### Getting credentials for a specific plan and intsance
+### Getting credentials for a specific plan and instance
 Get credentials that match a specific service plan and instance (replace "YOUR NLC NAME" with the name of your service instance).
 ```sh
 var vcapServices = require('vcap_services');
