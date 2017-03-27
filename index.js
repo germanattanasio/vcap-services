@@ -23,6 +23,32 @@ module.exports.getCredentials = function(name, plan, iname) {
         }
       }
     }
+  } else {
+    var env = process.env;
+    if(iname && env[iname]) {
+      console.log('returning iname');
+      var instance = JSON.parse(env[iname]);
+      return instance;
+    }
+    for (var key in env){
+      if (env.hasOwnProperty(key)) {
+        if (key.startsWith(name)){
+          console.log('key: ' + key + 'env[key]' + env[key]);
+          console.log('returning regexx');
+          var instance = JSON.parse(env[key]);
+          return instance;
+        }
+      }
+        /**var regex = new RegExp( name + '_*');
+        if (regex.test(key)) {
+
+          console.log('key: ' + key + 'env[key]' + env[key]);
+          console.log('returning regexx');
+          var instance = JSON.parse(env[key]);
+          return instance;
+        }
+      }**/
+    }
+    return {};
   }
-  return {};
 };
