@@ -1,16 +1,20 @@
 'use strict';
 
 /**
- * if VCAP_SERVICES exists then it returns the credentials
- * for the last service that stars with 'name' or {} otherwise
+ * if VCAP_SERVICES exists or the instance name exists in the
+ * environemnt, then it returns the credentials
+ * for the last service that starts with 'name' or {} otherwise
  * If plan is specified it will return the credentials for
  * the service instance that match that plan or {} otherwise
  * @param  String name, service name
  * @param  String plan, service plan
  * @param  String iname, instance name
  * @return {Object} the service credentials or {} if
- * name is not found in VCAP_SERVICES
+ * name is not found in VCAP_SERVICES or instance name
+ * is set as an environmental variable. Env var must be
+ * upper case.
  */
+
 module.exports.getCredentials = function(name, plan, iname) {
   if (process.env.VCAP_SERVICES) {
     var services = JSON.parse(process.env.VCAP_SERVICES);
@@ -23,32 +27,33 @@ module.exports.getCredentials = function(name, plan, iname) {
         }
       }
     }
-  } else {
-    var env = process.env;
-    if(iname && env[iname]) {
-      console.log('returning iname');
-      var instance = JSON.parse(env[iname]);
-      return instance;
+  }
+  //Check if env vars were set directly
+  var env = process.env,
+    instance = {};
+  if(iname) {
+    iname = iname.toUpperCase().replace(/[\s&-]/g, '_');
+    if(env[iname]){
+      try {
+        instance = JSON.parse(env[iname]);
+      } catch(e) {
+        console.warn('Error parsing JSON from process.env.' + iname );
+        console.warn(e);
+      }
     }
+  } else if (name && (Object.keys(name).length !== 0) ) {
     for (var key in env){
-      if (env.hasOwnProperty(key)) {
-        if (key.startsWith(name)){
-          console.log('key: ' + key + 'env[key]' + env[key]);
-          console.log('returning regexx');
-          var instance = JSON.parse(env[key]);
-          return instance;
+      name = name.toUpperCase().replace(/[\s&-]/g, '_');
+      if (env.hasOwnProperty(key) && key.startsWith(name)) {
+        try {
+          instance = JSON.parse(env[key]);
+          break;
+        } catch(e) {
+          console.warn('Error parsing JSON from process.env.' + key );
+          console.warn(e);
         }
       }
-        /**var regex = new RegExp( name + '_*');
-        if (regex.test(key)) {
-
-          console.log('key: ' + key + 'env[key]' + env[key]);
-          console.log('returning regexx');
-          var instance = JSON.parse(env[key]);
-          return instance;
-        }
-      }**/
     }
-    return {};
   }
+  return instance;
 };

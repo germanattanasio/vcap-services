@@ -7,6 +7,11 @@ function assertEmptyObject(expected, actual) {
   assert.equal(Object.keys(expected).length, Object.keys(actual).length);
 }
 
+// override console.warn and supress messages
+console.warn = function(t){
+  return ;
+}
+
 describe('vcap_services', function() {
   var ORIGINAL_VALUE = null;
   var credentials = {
@@ -15,10 +20,24 @@ describe('vcap_services', function() {
     username: '<username>',
     api_key: '<api_key>'
   };
+  var redis = {name: 'Compose for Redis-ov'};
+  var nosql_x5 = {name: 'Cloudant NoSQL DB-x5'};
+  var nosql_x6 = {name: 'Cloudant NoSQL DB-x6'};
 
   before(function() {
     // save VCAP_SERVICES value in an auxiliar variable.
     ORIGINAL_VALUE = process.env.VCAP_SERVICES;
+
+    // set individual service environmental variables
+    process.env.CONVERSATION_W1 = JSON.stringify(credentials);
+    process.env.COMPOSE_FOR_REDIS_OV = JSON.stringify(redis);
+
+    process.env.CLOUDANT_NOSQL_DB_X5 = JSON.stringify(nosql_x5);
+    process.env.CLOUDANT_NOSQL_DB_X6 = JSON.stringify(nosql_x6);
+
+    process.env.OBJECT_STORAGE_6J = 'Not JSON';
+
+    process.env.weather_company_data_wu = JSON.stringify({ name: 'weather-company_data_wu' });
 
     // set VCAP_SERVICES to a default value
     process.env.VCAP_SERVICES = JSON.stringify({
@@ -90,6 +109,50 @@ describe('vcap_services', function() {
 
   it('should return {} when service not found', function() {
     assertEmptyObject({}, vcapServices.getCredentials('foo'));
+  });
+
+  it('should return conversation service credentials', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentials('conversation'));
+    assert.deepEqual(credentials, vcapServices.getCredentials(null, null, 'conversation_w1'));
+  });
+
+  it('should return first available nosql db service information', function() {
+    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql_db'));
+    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql'));
+  });
+
+  it('should return instance of nosql db or fall back on service name if instance name DNE', function() {
+    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'cloudant_nosql_xx'));
+    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x5'));
+
+    assert.deepEqual(nosql_x5, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x5'));
+    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x5'));
+
+    assert.deepEqual(nosql_x6, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x6'));
+    assert.deepEqual(nosql_x6, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x6'));
+  });
+
+  it('should return {} if the env variable is not upper case', function() {
+    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'weather_company_data_wu'));
+    assert.deepEqual({}, vcapServices.getCredentials('weather_company_data'));
+  });
+
+  it('should return redis information when name or iname are specified with other delimiters [ -&]', function() {
+    assert.deepEqual(redis, vcapServices.getCredentials('COMPOSE_FOR_REDIS'));
+    assert.deepEqual(redis, vcapServices.getCredentials('Compose-for-Redis'));
+    assert.deepEqual(redis, vcapServices.getCredentials('Compose for Redis'));
+    assert.deepEqual(redis, vcapServices.getCredentials('Compose&for&Redis'));
+
+    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'COMPOSE_FOR_REDIS_OV'));
+    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose-for-Redis-ov'));
+    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose for redis ov'));
+    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose&for&redis-ov'));
+  });
+
+  it('should return {} when the env var is not JSON', function() {
+    assert.deepEqual({}, vcapServices.getCredentials('OBJECT_STORAGE'));
+
+    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'Object Storage-6j'));
   });
 
 });
