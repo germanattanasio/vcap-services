@@ -1,7 +1,7 @@
 # VCAP_SERVICES
 
-[![Build Status](https://travis-ci.org/germanattanasio/vcap_services.svg?branch=master)](http://travis-ci.org/germanattanasio/vcap_services)
-[![Coverage Status](https://coveralls.io/repos/germanattanasio/vcap_services/badge.svg?branch=master&service=github)](https://coveralls.io/github/germanattanasio/vcap_services?branch=master)
+[![Build Status](https://travis-ci.org/germanattanasio/vcap-services.svg?branch=master)](http://travis-ci.org/germanattanasio/vcap-services)
+[![Coverage Status](https://coveralls.io/repos/germanattanasio/vcap-services/badge.svg?branch=master&service=github)](https://coveralls.io/github/germanattanasio/vcap-services?branch=master)
 [![npm-version](https://img.shields.io/npm/v/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 [![npm-downloads](https://img.shields.io/npm/dm/vcap_services.svg)](https://www.npmjs.com/package/vcap_services)
 
@@ -98,6 +98,6 @@ $ mocha -g '<test name>'
 MIT.
 
 ## Contributing
-See [CONTRIBUTING](https://github.com/germanattanasio/vcap_services/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING](https://github.com/germanattanasio/vcap-services/blob/master/CONTRIBUTING.md).
 
 [Bluemix]: http://bluemix.net/
