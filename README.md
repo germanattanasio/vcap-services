@@ -37,6 +37,16 @@ If `VCAP_SERVICES` is:
 }
 ```
 
+OR If `PERSONALITY_INSIGHTS_*` (your instance name) is:
+```json
+{
+  "password": "<password>",
+  "url": "<url>",
+  "username": "<username>"
+}
+```
+
+
 Output:
 ```json
 {
@@ -48,7 +58,7 @@ Output:
 
 ### Getting credentials for a specific plan
 
-Get credentials that match a specific service plan.
+Get credentials that match a specific service plan (only for `VCAP_SERVICES`).
 ```sh
 var vcapServices = require('vcap_services');
 var credentials = vcapServices.getCredentials('personality_insights', 'standard');
