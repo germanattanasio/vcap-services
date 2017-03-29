@@ -1,6 +1,6 @@
 {
   "name": "vcap_services",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Parse and return service credentials from VCAP_SERVICES.",
   "main": "index.js",
   "keywords": [
