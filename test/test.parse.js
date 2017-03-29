@@ -8,9 +8,9 @@ function assertEmptyObject(expected, actual) {
 }
 
 // override console.warn and supress messages
-console.warn = function(t){
+console.warn = function(){
   return ;
-}
+};
 
 describe('vcap_services', function() {
   var ORIGINAL_VALUE = null;
