@@ -1,13 +1,12 @@
 {
   "name": "vcap_services",
   "version": "0.2.0",
-  "description": "Parse and return service credentials from VCAP_SERVICES or envirnmental variables.",
+  "description": "Parse and return service credentials from VCAP_SERVICES.",
   "main": "index.js",
   "keywords": [
     "bluemix",
     "vcap_services",
-    "cloud-foundry",
-    "kubernetes"
+    "cloud-foundry"
   ],
   "author": "German Attanasio Ruiz <germanattanasio@gmail.com>",
   "license": "MIT",
