@@ -42,8 +42,8 @@ module.exports.getCredentials = function(name, plan, iname) {
       }
     }
   } else if (name && (Object.keys(name).length !== 0) ) {
+    name = name.toUpperCase().replace(/[\s&-]/g, '_');
     for (var key in env){
-      name = name.toUpperCase().replace(/[\s&-]/g, '_');
       if (env.hasOwnProperty(key) && key.startsWith(name)) {
         try {
           instance = JSON.parse(env[key]);
