@@ -37,16 +37,6 @@ If `VCAP_SERVICES` is:
 }
 ```
 
-OR If `PERSONALITY_INSIGHTS_*` (your instance name) is:
-```json
-{
-  "password": "<password>",
-  "url": "<url>",
-  "username": "<username>"
-}
-```
-
-
 Output:
 ```json
 {

@@ -29,29 +29,17 @@ module.exports.getCredentials = function(name, plan, iname) {
     }
   }
   //Check if env vars were set directly
-  var env = process.env,
-    instance = {};
+  var env = process.env;
+  var instance = {};
+
   if(iname) {
     iname = iname.toUpperCase().replace(/[\s&-]/g, '_');
-    if(env[iname]){
+    if(env[iname]) {
       try {
         instance = JSON.parse(env[iname]);
       } catch(e) {
         console.warn('Error parsing JSON from process.env.' + iname );
         console.warn(e);
-      }
-    }
-  } else if (name && (Object.keys(name).length !== 0) ) {
-    name = name.toUpperCase().replace(/[\s&-]/g, '_');
-    for (var key in env){
-      if (env.hasOwnProperty(key) && key.startsWith(name)) {
-        try {
-          instance = JSON.parse(env[key]);
-          break;
-        } catch(e) {
-          console.warn('Error parsing JSON from process.env.' + key );
-          console.warn(e);
-        }
       }
     }
   }

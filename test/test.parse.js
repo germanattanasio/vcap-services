@@ -112,13 +112,11 @@ describe('vcap_services', function() {
   });
 
   it('should return conversation service credentials', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials('conversation'));
     assert.deepEqual(credentials, vcapServices.getCredentials(null, null, 'conversation_w1'));
   });
 
   it('should return first available nosql db service information', function() {
-    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql_db'));
-    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql'));
+    assert.deepEqual(nosql_x5, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x5'));
   });
 
   it('should return instance of nosql db or fall back on service name if instance name DNE', function() {
@@ -134,14 +132,10 @@ describe('vcap_services', function() {
 
   it('should return {} if the env variable is not upper case', function() {
     assert.deepEqual({}, vcapServices.getCredentials(null, null, 'weather_company_data_wu'));
-    assert.deepEqual({}, vcapServices.getCredentials('weather_company_data'));
+    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'weather_company_data'));
   });
 
   it('should return redis information when name or iname are specified with other delimiters [ -&]', function() {
-    assert.deepEqual(redis, vcapServices.getCredentials('COMPOSE_FOR_REDIS'));
-    assert.deepEqual(redis, vcapServices.getCredentials('Compose-for-Redis'));
-    assert.deepEqual(redis, vcapServices.getCredentials('Compose for Redis'));
-    assert.deepEqual(redis, vcapServices.getCredentials('Compose&for&Redis'));
 
     assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'COMPOSE_FOR_REDIS_OV'));
     assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose-for-Redis-ov'));
@@ -150,7 +144,7 @@ describe('vcap_services', function() {
   });
 
   it('should return {} when the env var is not JSON', function() {
-    assert.deepEqual({}, vcapServices.getCredentials('OBJECT_STORAGE'));
+    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'OBJECT_STORAGE'));
 
     assert.deepEqual({}, vcapServices.getCredentials(null, null, 'Object Storage-6j'));
   });
