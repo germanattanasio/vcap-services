@@ -27,6 +27,18 @@ module.exports.getCredentials = function(name, plan, iname) {
         }
       }
     }
+    // Check if credentials weren't found because the service was migrated to IAM
+    for (var service_name in services) {
+      for (var i = services[service_name].length - 1; i >= 0; i--) {
+        var instance = services[service_name][i];
+        var usingResourceName = instance.credentials && instance.credentials.resource_name;
+        if ((usingResourceName && instance.credentials.resource_name === name) && 
+          (!iname || iname === instance.name)
+        ) {
+          return instance.credentials || {};
+        }
+      }
+    }
   }
   //Check if env vars were set directly
   var env = process.env;
