@@ -150,3 +150,46 @@ describe('vcap_services', function() {
   });
 
 });
+
+describe('cf to iam migration', function() {
+  var ORIGINAL_VALUE = null;
+  var credentials = {
+    apikey: '10101010101',
+    iam_apikey_description: 'Auto generated apikey during resource-bind...',
+    iam_apikey_name: 'auto-generated-apikey-000-1111',
+    iam_role_crn: 'crn:v1:bluemix:public:iam::::',
+    iam_serviceid_crn: 'crn:v1:staging:public:iam-identity::000-111',
+    resource_name: 'conversation',
+    url: 'https://gateway-s.watsonplatform.net/assistant/api'
+  };
+
+  before(function() {
+    ORIGINAL_VALUE = process.env.VCAP_SERVICES;
+    process.env.VCAP_SERVICES = JSON.stringify({
+      'ibmcloud-link': [
+        {
+          credentials: credentials,
+          label: 'ibmcloud-link',
+          name: 'Watson-Assistant-23',
+          plan: 'ibmcloud-link-alias',
+          provider: null,
+          syslog_drain_url: null,
+          tags: ['ibmcloud-alias'],
+          volume_mounts: []
+        }
+      ]
+    });
+  });
+
+  after(function() {
+    // return the original value to VCAP_SERVICES
+    process.env.VCAP_SERVICES = ORIGINAL_VALUE;
+  });
+
+  it('should find the credentials using the old service name', function() {
+    assert.deepEqual(
+      credentials,
+      vcapServices.getCredentials('conversation', null, null)
+    );
+  });
+});
