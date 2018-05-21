@@ -19,8 +19,6 @@ module.exports.getCredentials = function(name, plan, iname) {
   if (process.env.VCAP_SERVICES) {
     var services = JSON.parse(process.env.VCAP_SERVICES);
     for (var service_name in services) {
-      if (service_name === 'ibmcloud-link') {
-      }
       if (service_name.indexOf(name) === 0) {
         for (var i = services[service_name].length - 1; i >= 0; i--) {
           var instance = services[service_name][i];
