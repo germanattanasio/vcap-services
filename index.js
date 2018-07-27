@@ -15,7 +15,7 @@
  * upper case.
  */
 
-module.exports.getCredentials = function(name, plan, iname) {
+const getCredentials = function(name, plan, iname) {
   if (process.env.VCAP_SERVICES) {
     var services = JSON.parse(process.env.VCAP_SERVICES);
     for (var service_name in services) {
@@ -44,4 +44,71 @@ module.exports.getCredentials = function(name, plan, iname) {
     }
   }
   return instance;
+};
+
+/**
+ * Returns the credentials that match the service label
+ * pass credentials in the following format:
+ * {
+ *  "watson_conversation_username": "username",
+ *  "watson_conversation_password": "password",
+ * }
+ * @param {string} serviceLabel The service label
+ * @param {object} credentials The credentials from starterkit
+ */
+const getCredentialsFromLocalConfig = function(serviceLabel, credentials) {
+  const creds = {};
+  const key = `watson_${serviceLabel}_`;
+  if(credentials) {
+    Object.keys(credentials)
+    .filter(c => c.indexOf(key) === 0)
+    .forEach(k => {
+      if (k.substr(key.length) === 'apikey') {
+        creds[`iam_${k.substr(key.length)}`] = credentials[k]
+      }
+      else {
+        creds[k.substr(key.length)] = credentials[k]
+      }
+    });
+  }
+  return creds;
+}
+
+/**
+ * Returns all the credentials that match the service label from env variables
+ *
+ * @param {string} serviceLabel The service label
+ * @param {object} credentials The credentials for starterkit from Kube Env
+ */
+const getCredentialsFromKubeEnv = function(serviceLabel) {
+  const credentials = process.env[`service_watson_${serviceLabel}`];
+  const creds = credentials ? getCredentialsFromLocalConfig(serviceLabel, JSON.parse(credentials)) : {};
+  return creds;
+}
+
+/**
+ * Returns all the credentials that match the service label from env variables
+ *
+ * @param {string} serviceLabel The service label
+ * @param {object} credentialsFromFile OPTIONAL: The credentials for starterkit from local file
+ */
+const getCredentialsForStarter = function(serviceLabel, credsFromFile) {
+  let creds = {};
+  if (credsFromFile) {
+    creds = getCredentialsFromLocalConfig(serviceLabel, credsFromFile);
+  }
+  else if (process.env.VCAP_SERVICES) {
+    creds = getCredentials(serviceLabel);
+  }
+  else {
+    creds = getCredentialsFromKubeEnv(serviceLabel);
+  }
+  return creds;
+}
+
+module.exports = {
+  getCredentials,
+  getCredentialsFromKubeEnv,
+  getCredentialsFromLocalConfig,
+  getCredentialsForStarter,
 };
