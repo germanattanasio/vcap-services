@@ -70,7 +70,11 @@ describe('vcap_services', function() {
 
   after(function() {
     // return the original value to VCAP_SERVICES
-    process.env.VCAP_SERVICES = ORIGINAL_VALUE;
+    if (ORIGINAL_VALUE) {
+      process.env.VCAP_SERVICES = ORIGINAL_VALUE;
+    } else {
+      process.env.VCAP_SERVICES = '';
+    }
   });
 
   it('should return {} for missing parameters', function() {
@@ -149,4 +153,59 @@ describe('vcap_services', function() {
     assert.deepEqual({}, vcapServices.getCredentials(null, null, 'Object Storage-6j'));
   });
 
+  it('should get the credentials for Starter', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentialsForStarter('personality_insights'));
+  });
+});
+
+
+describe('credentials file and Kube', function() {
+  var cloudCredentials = {
+    watson_conversation_password: '<password>',
+    watson_conversation_url: '<url>',
+    watson_conversation_username: '<username>',
+    watson_conversation_api_key: '<api_key>',
+    watson_conversation_apikey: '<apikey>',
+  };
+  var credentials = {
+    'api_key': '<api_key>',
+    'iam_apikey': '<apikey>',
+    'password': '<password>',
+    'url': '<url>',
+    'username': '<username>',
+  };
+
+  it('should return {} for missing parameters', function() {
+    assertEmptyObject({}, vcapServices.getCredentialsFromLocalConfig(null));
+    assertEmptyObject({}, vcapServices.getCredentialsFromLocalConfig({}));
+    assertEmptyObject({}, vcapServices.getCredentialsFromLocalConfig(undefined));
+  });
+
+  it('should return the credentials', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentialsFromLocalConfig('conversation', cloudCredentials));
+  });
+
+  it('should return no credentials for Kube', function() {
+    assert.deepEqual({}, vcapServices.getCredentialsFromKubeEnv('conversation'));
+  });
+
+  it('should return the credentials for Kube', function() {
+    process.env.service_watson_conversation = JSON.stringify(cloudCredentials);
+    assert.deepEqual(credentials, vcapServices.getCredentialsFromKubeEnv('conversation'));
+  });
+
+  it('should get the credentials for Starter from Kube', function() {
+    process.env.service_watson_conversation = JSON.stringify(cloudCredentials);
+    assert.deepEqual(credentials, vcapServices.getCredentialsForStarter('conversation'));
+  });
+
+  it('should get the credentials for Starter from file', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentialsForStarter('conversation', cloudCredentials));
+  });
+
+  it('should return {} for Starter from file for wrong params', function() {
+    assertEmptyObject({}, vcapServices.getCredentialsForStarter(null));
+    assertEmptyObject({}, vcapServices.getCredentialsForStarter({}));
+    assertEmptyObject({}, vcapServices.getCredentialsForStarter(undefined));
+  });
 });
