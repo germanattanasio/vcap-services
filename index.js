@@ -78,18 +78,6 @@ const getCredentialsFromLocalConfig = function(serviceLabel, credentials) {
  * Returns all the credentials that match the service label from env variables
  *
  * @param {string} serviceLabel The service label
- * @param {object} credentials The credentials for starterkit from Kube Env
- */
-const getCredentialsFromKubeEnv = function(serviceLabel) {
-  const credentials = process.env[`service_watson_${serviceLabel}`];
-  const creds = credentials ? getCredentialsFromLocalConfig(serviceLabel, JSON.parse(credentials)) : {};
-  return creds;
-}
-
-/**
- * Returns all the credentials that match the service label from env variables
- *
- * @param {string} serviceLabel The service label
  * @param {object} credentialsFromFile OPTIONAL: The credentials for starterkit from local file
  */
 const getCredentialsForStarter = function(serviceLabel, credsFromFile) {
@@ -100,15 +88,14 @@ const getCredentialsForStarter = function(serviceLabel, credsFromFile) {
   else if (process.env.VCAP_SERVICES) {
     creds = getCredentials(serviceLabel);
   }
-  else {
-    creds = getCredentialsFromKubeEnv(serviceLabel);
+  else if (process.env[`service_watson_${serviceLabel}`]){
+    creds = JSON.parse(process.env[`service_watson_${serviceLabel}`]);
   }
   return creds;
 }
 
 module.exports = {
   getCredentials,
-  getCredentialsFromKubeEnv,
   getCredentialsFromLocalConfig,
   getCredentialsForStarter,
 };
