@@ -82,19 +82,19 @@ const getCredentialsFromLocalConfig = function(serviceLabel, credentials) {
 * @param {string} serviceAltName - alternate name of service used for cloud foundry instances
 * @return {Object} - returns parameters modified to include credentials from service bind
 */
-const addCredentialsFromServiceBind = function(theParams, service, serviceAltName) {
-  if (Object.keys(theParams).length === 0) {
-    return theParams;
+const getCredentialsFromServiceBind = function(params, serviceName, serviceAltName) {
+  if (Object.keys(params).length === 0) {
+    return params;
   }
   let bxCreds = {};
-  if (theParams.__bx_creds && theParams.__bx_creds[service]) {
+  if (params.__bx_creds && params.__bx_creds[serviceName]) {
     // If user has IAM instance of service
-    bxCreds = theParams.__bx_creds[service];
-  } else if (theParams.__bx_creds && theParams.__bx_creds[serviceAltName]) {
+    bxCreds = params.__bx_creds[serviceName];
+  } else if (params.__bx_creds && params.__bx_creds[serviceAltName]) {
     // If user has no IAM instance of service, check for CF instances
-    bxCreds = theParams.__bx_creds[serviceAltName];
+    bxCreds = params.__bx_creds[serviceAltName];
   }
-  const _params = Object.assign({}, bxCreds, theParams);
+  const _params = Object.assign({}, bxCreds, params);
   if (_params.apikey) {
     _params.iam_apikey = _params.apikey;
     delete _params.apikey;
@@ -127,5 +127,5 @@ module.exports = {
   getCredentials,
   getCredentialsFromLocalConfig,
   getCredentialsForStarter,
-  addCredentialsFromServiceBind,
+  getCredentialsFromServiceBind,
 };
