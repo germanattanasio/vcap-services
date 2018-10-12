@@ -75,6 +75,35 @@ const getCredentialsFromLocalConfig = function(serviceLabel, credentials) {
 }
 
 /**
+* Helper function used to add credentials bound to cloud functions using wsk service bind
+*
+* @param {Object} theParams - parameters sent to service
+* @param {string} service - name of service in bluemix used to retrieve credentials, used for IAM instances
+* @param {string} serviceAltName - alternate name of service used for cloud foundry instances
+* @return {Object} - returns parameters modified to include credentials from service bind
+*/
+const getCredentialsFromServiceBind = function(params, serviceName, serviceAltName) {
+  if (Object.keys(params).length === 0) {
+    return params;
+  }
+  let bxCreds = {};
+  if (params.__bx_creds && params.__bx_creds[serviceName]) {
+    // If user has IAM instance of service
+    bxCreds = params.__bx_creds[serviceName];
+  } else if (params.__bx_creds && params.__bx_creds[serviceAltName]) {
+    // If user has no IAM instance of service, check for CF instances
+    bxCreds = params.__bx_creds[serviceAltName];
+  }
+  const _params = Object.assign({}, bxCreds, params);
+  if (_params.apikey) {
+    _params.iam_apikey = _params.apikey;
+    delete _params.apikey;
+  }
+  delete _params.__bx_creds;
+  return _params;
+}
+
+/**
  * Returns all the credentials that match the service label from env variables
  *
  * @param {string} serviceLabel The service label
@@ -98,4 +127,5 @@ module.exports = {
   getCredentials,
   getCredentialsFromLocalConfig,
   getCredentialsForStarter,
+  getCredentialsFromServiceBind,
 };

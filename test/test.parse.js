@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var extend = require('extend');
 var vcapServices = require('../index');
 
 function assertEmptyObject(expected, actual) {
@@ -200,4 +201,42 @@ describe('credentials file and Kube', function() {
     assertEmptyObject({}, vcapServices.getCredentialsForStarter({}));
     assertEmptyObject({}, vcapServices.getCredentialsForStarter(undefined));
   });
+});
+
+describe('cloud functions credentials bind', function() {
+
+  var credentials = {
+    'password': '<password>',
+    'username': '<username>',
+  };
+  it('should succeed with __bx_creds as credential source', function(){
+    var params = { text: 'hello', __bx_creds: {conversation: credentials}};
+    var _params = vcapServices.getCredentialsFromServiceBind(params, 'conversation');
+    assert.deepEqual(_params, extend({}, {text: 'hello'}, credentials));
+  });
+
+  it('should succeed with __bx_creds as credential source with an alternate name', function() {
+    var params = { text: 'hello', __bx_creds: {conversation: credentials}};
+    var _params = vcapServices.getCredentialsFromServiceBind(params, 'conversation');
+    assert.deepEqual(_params, extend({}, {text: 'hello'}, credentials));
+  });
+
+  it('should succeed with __bx_creds as credential source with an alternate name', function() {
+    var params = { text: 'hello', __bx_creds: {conversationAltName: credentials,}};
+    var _params = vcapServices.getCredentialsFromServiceBind(params, 'conversation', 'conversationAltName');
+    assert.deepEqual(_params, extend({}, {text: 'hello'}, credentials));
+  });
+
+  it('should not modify params with __bx_creds as credential source with a different name', function() {
+    var params = { text: 'hello', __bx_creds: {assistant: credentials,}};
+    var _params = vcapServices.getCredentialsFromServiceBind(params, 'conversation', 'conversationAltName');
+    assert.deepEqual(_params, extend({}, {text: 'hello'}));
+  });
+
+  it('should modify apikey to iam_apikey', function() {
+    var params = { text: 'hello', __bx_creds: {assistant: {apikey: '<api-key>'},}};
+    var _params = vcapServices.getCredentialsFromServiceBind(params, 'assistant');
+    assert.deepEqual(_params, {text: 'hello', iam_apikey: '<api-key>'});
+  });
+
 });
