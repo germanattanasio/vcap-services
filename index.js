@@ -119,6 +119,10 @@ const getCredentialsForStarter = function(serviceLabel, credsFromFile) {
   }
   else if (process.env[`service_watson_${serviceLabel}`]){
     creds = JSON.parse(process.env[`service_watson_${serviceLabel}`]);
+    if (creds.apikey) {
+      creds.iam_apikey = creds.apikey;
+      delete creds.apikey;
+    }
   }
   return creds;
 }
