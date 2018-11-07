@@ -187,9 +187,26 @@ describe('credentials file and Kube', function() {
   });
 
 
-  it('should get the credentials for Starter from Kube', function() {
-    process.env.service_watson_conversation = JSON.stringify(cloudCredentials);
-    assert.deepEqual(cloudCredentials, vcapServices.getCredentialsForStarter('conversation'));
+  it('should get the IAM credentials for Starter from Kube', function() {
+    var kubeCredentials = {
+      apikey: 'apikey',
+      url: 'url'
+    };
+    var expectedCredentials = {
+      iam_apikey: 'apikey',
+      url: 'url'
+    };
+    process.env.service_watson_discovery = JSON.stringify(kubeCredentials);
+    assert.deepEqual(expectedCredentials, vcapServices.getCredentialsForStarter('discovery'));
+  });
+
+  it('should get the CF credentials for Starter from Kube', function() {
+    var kubeCredentials = {
+      username: 'username',
+      password: 'password'
+    };
+    process.env.service_watson_discovery = JSON.stringify(kubeCredentials);
+    assert.deepEqual(kubeCredentials, vcapServices.getCredentialsForStarter('discovery'));
   });
 
   it('should get the credentials for Starter from file', function() {
