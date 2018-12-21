@@ -2,27 +2,28 @@
 
 /**
  * if VCAP_SERVICES exists or the instance name exists in the
- * environemnt, then it returns the credentials
+ * environment, then it returns the credentials
  * for the last service that starts with 'name' or {} otherwise
  * If plan is specified it will return the credentials for
  * the service instance that match that plan or {} otherwise
  * @param  String name, service name
  * @param  String plan, service plan
  * @param  String iname, instance name
+ * @param  String tag, tag
  * @return {Object} the service credentials or {} if
  * name is not found in VCAP_SERVICES or instance name
  * is set as an environmental variable. Env var must be
  * upper case.
  */
 
-const getCredentials = function(name, plan, iname) {
+const getCredentials = function(name, plan, iname, tag) {
   if (process.env.VCAP_SERVICES) {
     var services = JSON.parse(process.env.VCAP_SERVICES);
     for (var service_name in services) {
       if (service_name.indexOf(name) === 0) {
         for (var i = services[service_name].length - 1; i >= 0; i--) {
           var instance = services[service_name][i];
-          if ((!plan || plan === instance.plan) && (!iname || iname === instance.name))
+          if ((!plan || plan === instance.plan) && (!iname || iname === instance.name) && (!tag || (instance.tags || []).includes(tag)))
             return instance.credentials || {};
         }
       }

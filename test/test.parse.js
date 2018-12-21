@@ -65,6 +65,17 @@ describe('vcap_services', function() {
         name: 'NLC 2',
         plan: 'standard',
         credentials: credentials
+      }],
+      object_storage: [{
+        name: 'OS 1',
+        plan: 'standard',
+        credentials: credentials,
+        tags: ['eu']
+      },{
+        name: 'OS 2',
+        plan: 'standard',
+        credentials: credentials,
+        tags: ['us']
       }]
     });
   });
@@ -106,6 +117,13 @@ describe('vcap_services', function() {
     assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier','standard','NLC 1'));
     assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
     assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
+  });
+
+  it('should return the last available credentials that match a tag', function() {
+    assert.deepEqual(credentials, vcapServices.getCredentials('object_storage',null,null,'eu'));
+    assert.deepEqual({}, vcapServices.getCredentials('object_storage',null,null,'sa'));
+    assert.deepEqual({}, vcapServices.getCredentials('object_storage','foo',null,'eu'));
+    assert.deepEqual({}, vcapServices.getCredentials('object_storage','foo',null,'sa'));
   });
 
   it('should return {} when service plan not found', function() {

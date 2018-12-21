@@ -71,6 +71,14 @@ var credentials = vcapServices.getCredentials('natural_language_classifier', 'st
 console.log(credentials);
 ```
 
+### Getting credentials for a specific tag
+Get credentials that match a specific service tag.
+```sh
+var vcapServices = require('vcap_services');
+var credentials = vcapServices.getCredentials('object_storage', null, null, 'eu');
+console.log(credentials);
+```
+
 ## Tests
 Running all the tests:
 ```sh
