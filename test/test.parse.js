@@ -4,8 +4,8 @@ var assert = require('assert');
 var extend = require('extend');
 var vcapServices = require('../index');
 
-function assertEmptyObject(expected, actual) {
-  assert.equal(Object.keys(expected).length, Object.keys(actual).length);
+function assertEmptyObject(actual) {
+  assert.equal(0, Object.keys(actual).length);
 }
 
 // override console.warn and supress messages
@@ -89,98 +89,164 @@ describe('vcap_services', function() {
     }
   });
 
-  it('should return {} for missing parameters', function() {
-    assertEmptyObject({}, vcapServices.getCredentials(null));
-    assertEmptyObject({}, vcapServices.getCredentials({}));
-    assertEmptyObject({}, vcapServices.getCredentials(undefined));
+  describe('get', function() {
+    it('should return {} for missing parameters', function() {
+      assertEmptyObject(vcapServices.getCredentials(null));
+      assertEmptyObject(vcapServices.getCredentials({}));
+      assertEmptyObject(vcapServices.getCredentials(undefined));
+    });
+
+    it('should return the last available credentials', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights'));
+      assert.deepEqual(credentials, vcapServices.getCredentials('personality'));
+    });
+
+    it('should return the last available credentials that match a plan', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights','standard'));
+      assertEmptyObject(vcapServices.getCredentials('personality','beta'));
+      assertEmptyObject(vcapServices.getCredentials('personality','foo'));
+    });
+
+    it('should return the last available credentials that match an instance name', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier',null,'NLC 1'));
+      assertEmptyObject(vcapServices.getCredentials('natural_language_classifier',null,'NLC 3'));
+      assertEmptyObject(vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
+      assertEmptyObject(vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
+    });
+
+    it('should return the last available credentials that match a plan and an instance name', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier','standard','NLC 1'));
+      assertEmptyObject(vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
+      assertEmptyObject(vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
+    });
+
+    it('should return the last available credentials that match a tag', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentials('object_storage',null,null,'eu'));
+      assertEmptyObject(vcapServices.getCredentials('object_storage',null,null,'sa'));
+      assertEmptyObject(vcapServices.getCredentials('object_storage','foo',null,'eu'));
+      assertEmptyObject(vcapServices.getCredentials('object_storage','foo',null,'sa'));
+      assertEmptyObject(vcapServices.getCredentials('natural_language_classifier',null,null,'eu'));
+    });
+
+    it('should return {} when service plan not found', function() {
+      assertEmptyObject(vcapServices.getCredentials('personality','foo'));
+    });
+
+    it('should return {} when service not found', function() {
+      assertEmptyObject(vcapServices.getCredentials('foo'));
+    });
+
+    it('should return {} when service has no credentials', function() {
+      assertEmptyObject(vcapServices.getCredentials('personality_insights','not-a-plan'));
+    });
+
+    it('should return conversation service credentials', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentials(null, null, 'conversation_w1'));
+    });
+
+    it('should return first available nosql db service information', function() {
+      assert.deepEqual(nosql_x5, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x5'));
+    });
+
+    it('should return instance of nosql db or fall back on service name if instance name DNE', function() {
+      assertEmptyObject(vcapServices.getCredentials(null, null, 'cloudant_nosql_xx'));
+      assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x5'));
+
+      assert.deepEqual(nosql_x5, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x5'));
+      assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x5'));
+
+      assert.deepEqual(nosql_x6, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x6'));
+      assert.deepEqual(nosql_x6, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x6'));
+    });
+
+    it('should return {} if the env variable is not upper case', function() {
+      assertEmptyObject(vcapServices.getCredentials(null, null, 'weather_company_data_wu'));
+      assertEmptyObject(vcapServices.getCredentials(null, null, 'weather_company_data'));
+    });
+
+    it('should return redis information when name or iname are specified with other delimiters [ -&]', function() {
+      assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'COMPOSE_FOR_REDIS_OV'));
+      assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose-for-Redis-ov'));
+      assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose for redis ov'));
+      assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose&for&redis-ov'));
+    });
+
+    it('should return {} when the env var is not JSON', function() {
+      assertEmptyObject(vcapServices.getCredentials(null, null, 'OBJECT_STORAGE'));
+
+      assertEmptyObject(vcapServices.getCredentials(null, null, 'Object Storage-6j'));
+    });
+
+    it('should get the credentials for Starter', function() {
+      assert.deepEqual(credentials, vcapServices.getCredentialsForStarter('personality_insights'));
+    });
   });
 
-  it('should return the last available credentials', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights'));
-    assert.deepEqual(credentials, vcapServices.getCredentials('personality'));
-  });
+  describe('find', function() {
+    it('should return {} for missing parameters', function() {
+      assertEmptyObject(vcapServices.findCredentials(null));
+      assertEmptyObject(vcapServices.findCredentials(undefined));
+    });
 
-  it('should return the last available credentials that match a plan', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials('personality_insights','standard'));
-    assert.deepEqual({}, vcapServices.getCredentials('personality','beta'));
-    assert.deepEqual({}, vcapServices.getCredentials('personality','foo'));
-  });
+    it('returns first match for empty filters', function() {
+      assert.deepEqual(credentials, vcapServices.findCredentials({}));
+    });
 
-  it('should return the last available credentials that match an instance name', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier',null,'NLC 1'));
-    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier',null,'NLC 3'));
-    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
-    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
-  });
+    it('filters by service name if provided', function() {
+      assert.deepEqual(credentials, vcapServices.findCredentials({ service: 'personality_insights' }));
+      assert.deepEqual(credentials, vcapServices.findCredentials({ service: /^personality/ }));
+      assertEmptyObject(vcapServices.findCredentials({ service: 'foo' }));
+    });
 
-  it('should return the last available credentials that match a plan and an instance name', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials('natural_language_classifier','standard','NLC 1'));
-    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 1'));
-    assert.deepEqual({}, vcapServices.getCredentials('natural_language_classifier','foo','NLC 3'));
-  });
+    it('filters by instance properties if provided', function() {
+      assert.deepEqual(credentials, vcapServices.findCredentials({ service: 'personality_insights', instance: { plan: 'standard' } }));
+      assertEmptyObject(vcapServices.findCredentials({ service: 'personality_insights', instance: { plan: 'beta' } }));
+      assert.deepEqual(credentials, vcapServices.findCredentials({ service: 'natural_language_classifier', instance: { plan: 'standard', name: 'NLC 1' } }));
+      assertEmptyObject(vcapServices.findCredentials({ service: 'natural_language_classifier', instance: { plan: 'foo', name: 'NLC 1' } }));
+      assert.deepEqual(credentials, vcapServices.findCredentials({ service: 'object_storage', instance: { tags: 'eu', plan: 'standard' } }));
+      assertEmptyObject(vcapServices.findCredentials({ service: 'object_storage', instance: { name: 'foo', tags: 'eu' } }));
+    });
 
-  it('should return the last available credentials that match a tag', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials('object_storage',null,null,'eu'));
-    assertEmptyObject({}, vcapServices.getCredentials('object_storage',null,null,'sa'));
-    assertEmptyObject({}, vcapServices.getCredentials('object_storage','foo',null,'eu'));
-    assertEmptyObject({}, vcapServices.getCredentials('object_storage','foo',null,'sa'));
-    assertEmptyObject({}, vcapServices.getCredentials('natural_language_classifier',null,null,'eu'));
-  });
+    it('should return {} when service has no credentials', function() {
+      assertEmptyObject(vcapServices.findCredentials({ service: 'personality_insights', instance: { plan: 'not-a-plan' } }));
+    });
 
-  it('should return {} when service plan not found', function() {
-    assert.deepEqual({}, vcapServices.getCredentials('personality','foo'));
-  });
+    it('should return conversation service credentials', function() {
+      assert.deepEqual(credentials, vcapServices.findCredentials({ instance: { name: 'conversation_w1' } }));
+    });
 
-  it('should return {} when service not found', function() {
-    assertEmptyObject({}, vcapServices.getCredentials('foo'));
-  });
+    it('should return first available nosql db service information', function() {
+      assert.deepEqual(nosql_x5, vcapServices.findCredentials({ instance: { name: 'cloudant_nosql_db_x5' } }));
+    });
 
-  it('should return {} when service has no credentials', function() {
-    assertEmptyObject({}, vcapServices.getCredentials('personality_insights','not-a-plan'));
-  });
+    it('should return instance of nosql db or fall back on service name if instance name DNE', function() {
+      assertEmptyObject(vcapServices.findCredentials({ instance: { name: 'cloudant_nosql_xx' } }));
 
-  it('should return conversation service credentials', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentials(null, null, 'conversation_w1'));
-  });
+      assert.deepEqual(nosql_x5, vcapServices.findCredentials({ instance: { name: 'cloudant_nosql_db_x5' } }));
+      assert.deepEqual(nosql_x5, vcapServices.findCredentials({ service: 'cloudant_nosql', instance: { name: 'cloudant_nosql_db_x5' } }));
 
-  it('should return first available nosql db service information', function() {
-    assert.deepEqual(nosql_x5, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x5'));
-  });
+      assert.deepEqual(nosql_x6, vcapServices.findCredentials({ instance: { name: 'cloudant_nosql_db_x6' } }));
+      assert.deepEqual(nosql_x6, vcapServices.findCredentials({ service: 'cloudant_nosql', instance: { name: 'cloudant_nosql_db_x6' } }));
+    });
 
-  it('should return instance of nosql db or fall back on service name if instance name DNE', function() {
-    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'cloudant_nosql_xx'));
-    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x5'));
+    it('should return {} if the env variable is not upper case', function() {
+      assertEmptyObject(vcapServices.findCredentials({ instance: { name: 'weather_company_data_wu' } }));
+      assertEmptyObject(vcapServices.findCredentials({ instance: { name: 'weather_company_data' } }));
+    });
 
-    assert.deepEqual(nosql_x5, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x5'));
-    assert.deepEqual(nosql_x5, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x5'));
+    it('should return redis information when name or iname are specified with other delimiters [ -&]', function() {
+      assert.deepEqual(redis, vcapServices.findCredentials({ instance: { name: 'COMPOSE_FOR_REDIS_OV' } }));
+      assert.deepEqual(redis, vcapServices.findCredentials({ instance: { name: 'Compose-for-Redis-ov' } }));
+      assert.deepEqual(redis, vcapServices.findCredentials({ instance: { name: 'Compose for redis ov' } }));
+      assert.deepEqual(redis, vcapServices.findCredentials({ instance: { name: 'Compose&for&redis-ov' } }));
+    });
 
-    assert.deepEqual(nosql_x6, vcapServices.getCredentials(null, null, 'cloudant_nosql_db_x6'));
-    assert.deepEqual(nosql_x6, vcapServices.getCredentials('cloudant_nosql', null, 'cloudant_nosql_db_x6'));
-  });
-
-  it('should return {} if the env variable is not upper case', function() {
-    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'weather_company_data_wu'));
-    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'weather_company_data'));
-  });
-
-  it('should return redis information when name or iname are specified with other delimiters [ -&]', function() {
-    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'COMPOSE_FOR_REDIS_OV'));
-    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose-for-Redis-ov'));
-    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose for redis ov'));
-    assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose&for&redis-ov'));
-  });
-
-  it('should return {} when the env var is not JSON', function() {
-    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'OBJECT_STORAGE'));
-
-    assert.deepEqual({}, vcapServices.getCredentials(null, null, 'Object Storage-6j'));
-  });
-
-  it('should get the credentials for Starter', function() {
-    assert.deepEqual(credentials, vcapServices.getCredentialsForStarter('personality_insights'));
+    it('should return {} when the env var is not JSON', function() {
+      assertEmptyObject(vcapServices.findCredentials({ instance: { 'name': 'OBJECT_STORAGE' } }));
+      assertEmptyObject(vcapServices.findCredentials({ instance: { 'name': 'Object Storage-6j' } }));
+    });
   });
 });
-
 
 describe('credentials file and Kube', function() {
   var cloudCredentials = {
@@ -199,9 +265,9 @@ describe('credentials file and Kube', function() {
   };
 
   it('should return {} for missing parameters', function() {
-    assertEmptyObject({}, vcapServices.getCredentialsFromLocalConfig(null));
-    assertEmptyObject({}, vcapServices.getCredentialsFromLocalConfig({}));
-    assertEmptyObject({}, vcapServices.getCredentialsFromLocalConfig(undefined));
+    assertEmptyObject(vcapServices.getCredentialsFromLocalConfig(null));
+    assertEmptyObject(vcapServices.getCredentialsFromLocalConfig({}));
+    assertEmptyObject(vcapServices.getCredentialsFromLocalConfig(undefined));
   });
 
   it('should return the credentials', function() {
@@ -236,9 +302,9 @@ describe('credentials file and Kube', function() {
   });
 
   it('should return {} for Starter from file for wrong params', function() {
-    assertEmptyObject({}, vcapServices.getCredentialsForStarter(null));
-    assertEmptyObject({}, vcapServices.getCredentialsForStarter({}));
-    assertEmptyObject({}, vcapServices.getCredentialsForStarter(undefined));
+    assertEmptyObject(vcapServices.getCredentialsForStarter(null));
+    assertEmptyObject(vcapServices.getCredentialsForStarter({}));
+    assertEmptyObject(vcapServices.getCredentialsForStarter(undefined));
   });
 });
 
