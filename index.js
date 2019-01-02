@@ -89,9 +89,9 @@ const vcapServicesToFindFrom = function(service_filter) {
         services.push(vcap_services[service_name]);
       }
     }
-    return services.flat();
+    return [].concat.apply([], services);
   } else if (typeof service_filter == 'undefined') {
-    return Object.values(vcap_services).flat();
+    return [].concat.apply([], Object.values(vcap_services));
   } else {
     return vcap_services[service_filter] || [];
   }
