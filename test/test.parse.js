@@ -121,9 +121,10 @@ describe('vcap_services', function() {
 
   it('should return the last available credentials that match a tag', function() {
     assert.deepEqual(credentials, vcapServices.getCredentials('object_storage',null,null,'eu'));
-    assert.deepEqual({}, vcapServices.getCredentials('object_storage',null,null,'sa'));
-    assert.deepEqual({}, vcapServices.getCredentials('object_storage','foo',null,'eu'));
-    assert.deepEqual({}, vcapServices.getCredentials('object_storage','foo',null,'sa'));
+    assertEmptyObject({}, vcapServices.getCredentials('object_storage',null,null,'sa'));
+    assertEmptyObject({}, vcapServices.getCredentials('object_storage','foo',null,'eu'));
+    assertEmptyObject({}, vcapServices.getCredentials('object_storage','foo',null,'sa'));
+    assertEmptyObject({}, vcapServices.getCredentials('natural_language_classifier',null,null,'eu'));
   });
 
   it('should return {} when service plan not found', function() {
@@ -132,6 +133,10 @@ describe('vcap_services', function() {
 
   it('should return {} when service not found', function() {
     assertEmptyObject({}, vcapServices.getCredentials('foo'));
+  });
+
+  it('should return {} when service has no credentials', function() {
+    assertEmptyObject({}, vcapServices.getCredentials('personality_insights','not-a-plan'));
   });
 
   it('should return conversation service credentials', function() {
@@ -159,7 +164,6 @@ describe('vcap_services', function() {
   });
 
   it('should return redis information when name or iname are specified with other delimiters [ -&]', function() {
-
     assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'COMPOSE_FOR_REDIS_OV'));
     assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose-for-Redis-ov'));
     assert.deepEqual(redis, vcapServices.getCredentials(null, null, 'Compose for redis ov'));
