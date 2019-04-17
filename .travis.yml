@@ -8,7 +8,6 @@ cache:
 
 install:
   - npm install
-  - npm install semantic-release@13.1.1
 
 script:
   - npm test
