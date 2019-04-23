@@ -23,7 +23,7 @@
     "istanbul": "~0.4.5",
     "jshint": "~2.9.7",
     "extend": "^3.0.2",
-    "semantic-release": "^13.1.1"
+    "semantic-release": "^15.3.0"
   },
   "dependencies": {},
   "scripts": {
